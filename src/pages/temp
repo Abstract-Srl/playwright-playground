@@ -1,0 +1,350 @@
+//Componente CartPage.tsx
+import React from 'react';
+import Header from '../components/Header';
+import Cart from '../components/Cart';
+
+const CartPage: React.FC = () => {
+    return (
+        <div>
+            <Header />
+            <h1>Your Cart</h1>
+            <Cart />
+        </div>
+    );
+};
+
+export default CartPage;
+
+//Componente Cart.tsx
+import React from 'react';
+import styled from 'styled-components';
+import { useMainContext } from '../context/MainContext';
+import CartItem from './CartItem';
+
+const CartWrapper = styled.div`
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  max-width: 800px;
+  margin: 2rem auto;
+`;
+
+const CartTitle = styled.h2`
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+`;
+
+const CartTotal = styled.div`
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-align: right;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e0e0e0;
+`;
+
+const EmptyCartMessage = styled.p`
+  text-align: center;
+  font-style: italic;
+  color: ${props => props.theme.colors.text};
+`;
+
+const Cart: React.FC = () => {
+    const { cart } = useMainContext();
+
+    const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+    return (
+        <CartWrapper>
+            <CartTitle>Your Cart</CartTitle>
+            {cart.length === 0 ? (
+                <EmptyCartMessage>Your cart is empty.</EmptyCartMessage>
+            ) : (
+                <>
+                    {cart.map((item) => (
+                        <CartItem key={item.id} {...item} />
+                    ))}
+                    <CartTotal className="cart-total">Total: ${total.toFixed(2)}</CartTotal>
+                </>
+            )}
+        </CartWrapper>
+    );
+};
+
+export default Cart;
+
+//Componente Header.tsx
+import React from 'react';
+import {Link} from 'react-router-dom';
+import styled from 'styled-components';
+import {useMainContext} from '../context/MainContext';
+
+const HeaderWrapper = styled.header`
+  background-color: ${props => props.theme.colors.primary};
+  padding: 1rem;
+`;
+
+const Nav = styled.nav`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+`;
+
+const NavList = styled.ul`
+  list-style-type: none;
+  display: flex;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+`;
+
+const NavItem = styled.li`
+  a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    transition: opacity 0.3s ease;
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+`;
+
+const CartBadge = styled.span`
+  background-color: ${props => props.theme.colors.accent};
+  color: white;
+  border-radius: 50%;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.8rem;
+  margin-left: 0.5rem;
+`;
+
+const RightHeader = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 50px
+`
+
+const UserAvatar = styled.div`
+  width: 50px;
+  height: 50px;
+  background-color: white;
+  border-radius: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+`
+
+const Header: React.FC = () => {
+    const {cart, user} = useMainContext();
+    const initials = user ? user?.name.first.charAt(0).toUpperCase() + user?.name.last.charAt(0).toUpperCase() : ''
+
+    return (
+        <HeaderWrapper>
+            <Nav>
+                <NavList>
+                    <NavItem><Link to="/">Home</Link></NavItem>
+                    <NavItem><Link to="/products">Products</Link></NavItem>
+                    <NavItem><Link to="/login">Login</Link></NavItem>
+                </NavList>
+                {!!user && (
+                    <RightHeader>
+                        <NavItem>
+                            <Link to="/cart">
+                                Cart
+                                <CartBadge>{cart.reduce((total, item) => total + item.quantity, 0)}</CartBadge>
+                            </Link>
+                        </NavItem>
+                        {!!initials && (
+                            <UserAvatar>
+                                {initials}
+                            </UserAvatar>
+                        )}
+                    </RightHeader>
+                )}
+            </Nav>
+        </HeaderWrapper>
+    );
+};
+
+export default Header;
+
+//Componente CartItem.tsx
+import React from 'react';
+import styled from 'styled-components';
+import { useMainContext } from '../context/MainContext';
+
+const CartItemWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  border-bottom: 1px solid #e0e0e0;
+`;
+
+const ItemInfo = styled.div`
+  flex: 1;
+`;
+
+const ItemTitle = styled.h3`
+  font-size: 1.1rem;
+  margin: 0 0 0.5rem 0;
+`;
+
+const ItemPrice = styled.p`
+  color: ${props => props.theme.colors.primary};
+  font-weight: bold;
+  margin: 0;
+`;
+
+const ItemQuantity = styled.p`
+  margin: 0;
+`;
+
+const RemoveButton = styled.button`
+  background-color: ${props => props.theme.colors.accent};
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+
+  &:hover {
+    opacity: 0.8;
+  }
+`;
+
+interface CartItemProps {
+    id: number;
+    title: string;
+    price: number;
+    quantity: number;
+}
+
+const CartItem: React.FC<CartItemProps> = ({ id, title, price, quantity }) => {
+    const { removeFromCart } = useMainContext();
+
+    return (
+        <CartItemWrapper className="cart-item">
+            <ItemInfo>
+                <ItemTitle>{title}</ItemTitle>
+                <ItemPrice>${price.toFixed(2)}</ItemPrice>
+                <ItemQuantity>Quantity: {quantity}</ItemQuantity>
+            </ItemInfo>
+            <RemoveButton onClick={() => removeFromCart(id)}>Remove</RemoveButton>
+        </CartItemWrapper>
+    );
+};
+
+export default CartItem;
+
+//Componente ProductList.tsx
+import React from 'react';
+import styled from 'styled-components';
+import ProductItem from './ProductItem';
+import { products } from '../utils/testData';
+
+const ProductListWrapper = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 2rem;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+`;
+
+const ProductList: React.FC = () => {
+    return (
+        <ProductListWrapper>
+            {products.map((product) => (
+                <ProductItem key={product.id} {...product} />
+            ))}
+        </ProductListWrapper>
+    );
+};
+
+export default ProductList;
+
+//Componente CartItem.tsx
+import React from 'react';
+import styled from 'styled-components';
+import { useMainContext } from '../context/MainContext';
+
+const ProductItemWrapper = styled.div`
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+  }
+`;
+
+const ProductImage = styled.img`
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+`;
+
+const ProductTitle = styled.h3`
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  text-align: center;
+`;
+
+const ProductPrice = styled.p`
+  font-weight: bold;
+  color: ${props => props.theme.colors.primary};
+  margin-bottom: 1rem;
+`;
+
+const AddToCartButton = styled.button`
+  background-color: ${props => props.theme.colors.secondary};
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: ${props => props.theme.colors.primary};
+  }
+`;
+
+interface ProductItemProps {
+    id: number;
+    title: string;
+    price: number;
+    image: string;
+}
+
+const ProductItem: React.FC<ProductItemProps> = ({ id, title, price, image }) => {
+    const { addToCart } = useMainContext();
+
+    return (
+        <ProductItemWrapper>
+            <ProductImage src={image} alt={title} />
+            <ProductTitle>{title}</ProductTitle>
+            <ProductPrice>${price.toFixed(2)}</ProductPrice>
+            <AddToCartButton onClick={() => addToCart({ id, title, price, quantity: 1 })}>
+                Add to Cart
+            </AddToCartButton>
+        </ProductItemWrapper>
+    );
+};
+
+export default ProductItem;
