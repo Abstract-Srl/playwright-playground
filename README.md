@@ -1,143 +1,143 @@
-# Guida Essenziale a Playwright
+# Essential Guide to Playwright
 
-## Indice
-1. [Introduzione a Playwright](#introduzione-a-playwright)
-2. [Configurazione di Playwright](#configurazione-di-playwright)
-3. [Scrivere il Primo Test](#scrivere-il-primo-test)
-4. [Migliori Pratiche per i Selettori](#migliori-pratiche-per-i-selettori)
-5. [Tecniche Avanzate di Scrittura dei Test](#tecniche-avanzate-di-scrittura-dei-test)
-6. [Esecuzione dei Test](#esecuzione-dei-test)
-7. [Generazione e Analisi dei Report HTML](#generazione-e-analisi-dei-report-html)
-8. [Risoluzione dei Problemi](#risoluzione-dei-problemi)
+## Table of Contents
+1. [Introduction to Playwright](#introduction-to-playwright)
+2. [Setting Up Playwright](#setting-up-playwright)
+3. [Writing Your First Test](#writing-your-first-test)
+4. [Best Practices for Selectors](#best-practices-for-selectors)
+5. [Advanced Test Writing Techniques](#advanced-test-writing-techniques)
+6. [Running Tests](#running-tests)
+7. [Generating and Analyzing HTML Reports](#generating-and-analyzing-html-reports)
+8. [Troubleshooting](#troubleshooting)
 
-## Introduzione a Playwright
+## Introduction to Playwright
 
-Playwright è una potente libreria di automazione open-source sviluppata da Microsoft. Permette di scrivere test end-to-end affidabili per applicazioni web moderne su tutti i principali motori di rendering, inclusi Chromium, Firefox e WebKit.
+Playwright is a powerful open-source automation library developed by Microsoft. It allows you to write reliable end-to-end tests for modern web applications across all major rendering engines, including Chromium, Firefox, and WebKit.
 
-Caratteristiche principali:
-- Supporto multi-browser
-- Funzionalità di attesa automatica
-- Selettori potenti
-- Emulazione di dispositivi mobili
-- Intercettazione di rete
+**Key Features:**
+- Multi-browser support
+- Automatic waiting capabilities
+- Powerful selectors
+- Mobile device emulation
+- Network interception
 
-## Configurazione di Playwright
+## Setting Up Playwright
 
-1. Installare Playwright:
-   ```
+1. **Install Playwright:**
+   ```bash
    npm init playwright@latest
    ```
 
-2. Installare i browser:
-   ```
+2. **Install the browsers:**
+   ```bash
    npx playwright install
    ```
 
-## Scrivere il Primo Test
+## Writing Your First Test
 
-Ecco un esempio di un test base con Playwright:
+Here is an example of a basic test with Playwright:
 
 ```typescript
 import { test, expect } from '@playwright/test';
 
-test('test base', async ({ page }) => {
+test('basic test', async ({ page }) => {
   await page.goto('https://playwright.dev/');
-  const titolo = page.locator('.navbar__inner .navbar__title');
-  await expect(titolo).toHaveText('Playwright');
+  const title = page.locator('.navbar__inner .navbar__title');
+  await expect(title).toHaveText('Playwright');
 });
 ```
 
-## Migliori Pratiche per i Selettori
+## Best Practices for Selectors
 
-1. **Utilizzare attributi data-testid**:
-   Questi sono i selettori più affidabili in quanto non sono influenzati dai cambiamenti dell'interfaccia utente.
+1. **Use `data-testid` Attributes:**
+   These are the most reliable selectors as they are not affected by changes in the user interface.
 
-   HTML:
+   **HTML:**
    ```html
-   <button data-testid="pulsante-invio">Invia</button>
+   <button data-testid="submit-button">Submit</button>
    ```
 
-   Test:
+   **Test:**
    ```typescript
-   await page.click('[data-testid="pulsante-invio"]');
+   await page.click('[data-testid="submit-button"]');
    ```
 
-2. **Utilizzare ruoli ARIA**:
-   I ruoli ARIA forniscono un significato semantico ai tuoi elementi, rendendo i tuoi test più accessibili e robusti.
+2. **Use ARIA Roles:**
+   ARIA roles provide semantic meaning to your elements, making your tests more accessible and robust.
 
-   HTML:
+   **HTML:**
    ```html
-   <button role="tab">Profilo</button>
+   <button role="tab">Profile</button>
    ```
 
-   Test:
+   **Test:**
    ```typescript
-   await page.click('role=tab[name="Profilo"]');
+   await page.click('role=tab[name="Profile"]');
    ```
 
-3. **Contenuto testuale**:
-   Quando appropriato, usa il contenuto testuale per la selezione.
+3. **Text Content:**
+   When appropriate, use text content for selection.
 
    ```typescript
-   await page.click('text=Invia');
+   await page.click('text=Submit');
    ```
 
-4. **Combinare i selettori**:
-   Per una selezione più specifica, combina diversi tipi di selettori.
+4. **Combine Selectors:**
+   For more specific selection, combine different types of selectors.
 
    ```typescript
-   await page.click('button[data-testid="pulsante-invio"]:has-text("Invia")');
+   await page.click('button[data-testid="submit-button"]:has-text("Submit")');
    ```
 
-## Tecniche Avanzate di Scrittura dei Test
+## Advanced Test Writing Techniques
 
-1. **Test API**:
-   Usa il contesto `request` di Playwright per i test API.
+1. **API Testing:**
+   Use Playwright's `request` context for API tests.
 
    ```typescript
-   test('test API', async ({ request }) => {
-     const risposta = await request.get('https://api.example.com/dati');
-     expect(risposta.ok()).toBeTruthy();
-     expect(await risposta.json()).toEqual(expect.objectContaining({
-       chiave: 'valore'
+   test('API test', async ({ request }) => {
+     const response = await request.get('https://api.example.com/data');
+     expect(response.ok()).toBeTruthy();
+     expect(await response.json()).toEqual(expect.objectContaining({
+       key: 'value'
      }));
    });
    ```
 
-## Esecuzione dei Test
+## Running Tests
 
-1. **Eseguire tutti i test**:
-   ```
+1. **Run All Tests:**
+   ```bash
    npx playwright test
    ```
 
-2. **Eseguire un file di test specifico**:
-   ```
-   npx playwright test tests/esempio.spec.ts
+2. **Run a Specific Test File:**
+   ```bash
+   npx playwright test tests/example.spec.ts
    ```
 
-3. **Eseguire i test in modalità headed** (con il browser visibile):
-   ```
+3. **Run Tests in Headed Mode** (with the browser visible):
+   ```bash
    npx playwright test --headed
    ```
 
-4. **Eseguire i test con la modalità UI**:
-   La modalità UI fornisce un'interfaccia interattiva per l'esecuzione e il debug dei test.
-   ```
+4. **Run Tests with UI Mode:**
+   The UI mode provides an interactive interface for running and debugging tests.
+   ```bash
    npx playwright test --ui
    ```
 
-5. **Eseguire i test in modalità debug**:
-   ```
+5. **Run Tests in Debug Mode:**
+   ```bash
    npx playwright test --debug
    ```
 
-## Generazione e Analisi dei Report HTML
+## Generating and Analyzing HTML Reports
 
-Playwright genera automaticamente un report HTML dopo l'esecuzione dei test. Tuttavia, se riscontri l'errore "No report found", segui questi passaggi:
+Playwright automatically generates an HTML report after running tests. However, if you encounter the error "No report found," follow these steps:
 
-1. **Assicurati di generare il report**:
-   Modifica il tuo file `playwright.config.ts` per includere la configurazione del reporter HTML:
+1. **Ensure Report Generation:**
+   Modify your `playwright.config.ts` file to include the HTML reporter configuration:
 
    ```typescript
    import { PlaywrightTestConfig } from '@playwright/test';
@@ -149,40 +149,40 @@ Playwright genera automaticamente un report HTML dopo l'esecuzione dei test. Tut
    export default config;
    ```
 
-2. **Esegui i test**:
-   ```
+2. **Run the Tests:**
+   ```bash
    npx playwright test
    ```
 
-3. **Visualizza il report**:
-   Dopo l'esecuzione dei test, usa il comando:
-   ```
+3. **View the Report:**
+   After running the tests, use the command:
+   ```bash
    npx playwright show-report
    ```
 
-   Se il comando non funziona, puoi aprire manualmente il file `playwright-report/index.html` nel tuo browser.
+   If the command does not work, you can manually open the `playwright-report/index.html` file in your browser.
 
-4. **Analizzare il report**:
-   Il report HTML fornisce una panoramica dettagliata dei risultati dei test, inclusi:
-    - Riepilogo dei test passati/falliti
-    - Durata di ciascun test
-    - Screenshot e tracce per i test falliti
-    - Dettagli degli errori per facilitare il debug
+4. **Analyze the Report:**
+   The HTML report provides a detailed overview of the test results, including:
+   - Summary of passed/failed tests
+   - Duration of each test
+   - Screenshots and traces for failed tests
+   - Error details to facilitate debugging
 
-Ricorda di eseguire sempre i test prima di tentare di visualizzare il report, in quanto il report viene generato durante l'esecuzione dei test.
+   Remember to always run the tests before attempting to view the report, as the report is generated during test execution.
 
-## Risoluzione dei Problemi
+## Troubleshooting
 
-1. **Test instabili**:
-   Usa `test.retry()` per rieseguire i test instabili. Investiga e correggi la causa principale dell'instabilità.
+1. **Unstable Tests:**
+   Use `test.retry()` to rerun unstable tests. Investigate and fix the root cause of the instability.
 
-2. **Problemi con i selettori**:
-   Usa il selettore di elementi di Playwright in modalità debug per verificare i selettori.
+2. **Selector Issues:**
+   Use Playwright's element selector in debug mode to verify selectors.
 
-3. **Performance**:
-   Utilizza l'esecuzione parallela e minimizza le azioni non necessarie nei tuoi test.
+3. **Performance:**
+   Utilize parallel execution and minimize unnecessary actions in your tests.
 
-4. **Debug**:
-   Usa il flag `--debug` o la modalità UI per il debug interattivo.
+4. **Debugging:**
+   Use the `--debug` flag or UI mode for interactive debugging.
 
-Ricorda, un testing E2E efficace con Playwright implica la scrittura di test stabili e manutenibili che rappresentano accuratamente gli scenari degli utenti. La refactoring e l'aggiornamento regolari dei test insieme al codice dell'applicazione sono cruciali per mantenere una suite di test robusta.
+Remember, effective E2E testing with Playwright involves writing stable and maintainable tests that accurately represent user scenarios. Regularly refactoring and updating tests alongside your application code is crucial to maintaining a robust test suite.
