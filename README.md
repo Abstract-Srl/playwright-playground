@@ -170,19 +170,3 @@ Playwright automatically generates an HTML report after running tests. However, 
    - Error details to facilitate debugging
 
    Remember to always run the tests before attempting to view the report, as the report is generated during test execution.
-
-## Troubleshooting
-
-1. **Unstable Tests:**
-   Use `test.retry()` to rerun unstable tests. Investigate and fix the root cause of the instability.
-
-2. **Selector Issues:**
-   Use Playwright's element selector in debug mode to verify selectors.
-
-3. **Performance:**
-   Utilize parallel execution and minimize unnecessary actions in your tests.
-
-4. **Debugging:**
-   Use the `--debug` flag or UI mode for interactive debugging.
-
-Remember, effective E2E testing with Playwright involves writing stable and maintainable tests that accurately represent user scenarios. Regularly refactoring and updating tests alongside your application code is crucial to maintaining a robust test suite.
